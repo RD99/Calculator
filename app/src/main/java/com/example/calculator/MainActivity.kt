@@ -28,11 +28,11 @@ class MainActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         val username= intent.getStringExtra("Username").toString()
         println(username)
-        Toast.makeText(applicationContext, "welcome $username !", Toast.LENGTH_LONG).show()
+        Toast.makeText(applicationContext, "welcome ${mAuth.currentUser?.email} !", Toast.LENGTH_LONG).show()
         //addButtons()
         val intent = Intent(this@MainActivity, LoginActivity::class.java)
         println(mAuth.currentUser?.email)
-        if (mAuth.currentUser==null){
+        if (mAuth.currentUser?.email==null){
             startActivity(intent)
         }
         binding.logout?.setOnClickListener {
@@ -63,11 +63,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun onClear(view: View) {
+    @Suppress("UNUSED_PARAMETER")
+    fun onClear(_view: View) {
         resultText.text = ""
     }
 
-    fun onEquals(view: View) {
+    @Suppress("UNUSED_PARAMETER")
+    fun onEquals(_view: View) {
 
 
         val operatorList: MutableList<String> = ArrayList()
