@@ -2,6 +2,7 @@ package com.example.calculator
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -11,6 +12,7 @@ import com.android.volley.toolbox.Volley
 import com.example.calculator.databinding.ActivityMainBinding
 import com.example.calculator.ui.login.LoginActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -58,6 +60,9 @@ class MainActivity : AppCompatActivity() {
         }
         //binding.resultText.text=binding.resultText.text+buttonText
         //binding.resultText.text="added"
+        if (resultText.text.toString()=="5"){
+            FirebaseCrashlytics.getInstance().log("number 5 pressed!")
+        }
 
         //resultText.append(buttonText)
 
@@ -108,27 +113,32 @@ class MainActivity : AppCompatActivity() {
 
             }
             resultText.text = result.toString()
+            val url = "http://numbersapi.com/${resultText.text.toString().toDouble().toInt()}"
+            println(url)
+            val que = Volley.newRequestQueue(applicationContext)
+            que.add(StringRequest(url,
+                { response ->
+                    Toast.makeText(
+                        applicationContext,
+                        "Fact: %s".format(response.toString()),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    //resultText.text = "Response: %s".format(response.toString())
+                    println(response.toString())
+                },
+                { error ->
+                    println(error)
+                }
+            ))
         } catch (e: Exception) {
             Toast.makeText(applicationContext, "Error", Toast.LENGTH_SHORT).show()
+            Log.e("OnEqual",e.toString())
+            FirebaseCrashlytics.getInstance().recordException(e)
+            //FirebaseCrashlytics.getInstance().sendUnsentReports()
+
             resultText.text = ""
         }
-        val url = "http://numbersapi.com/${resultText.text.toString().toDouble().toInt()}"
-        println(url)
-        val que = Volley.newRequestQueue(applicationContext)
-        que.add(StringRequest(url,
-            { response ->
-                Toast.makeText(
-                    applicationContext,
-                    "Fact: %s".format(response.toString()),
-                    Toast.LENGTH_LONG
-                ).show()
-                //resultText.text = "Response: %s".format(response.toString())
-                println(response.toString())
-            },
-            { error ->
-                println(error)
-            }
-        ))
+
 
     }
 
